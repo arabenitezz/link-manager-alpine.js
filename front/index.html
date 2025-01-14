@@ -66,15 +66,9 @@
             
             <!-- Toggle de comentarios -->
             <div class="comments-toggle">
-              <input 
-                type="checkbox" 
-                :id="'toggle-comments-' + link._id" 
-                class="comments-toggle-checkbox"
-                x-model="commentVisibility[link._id]"
-              >
-              <label :for="'toggle-comments-' + link._id">
+              <button @click="commentVisibility[link._id] = !commentVisibility[link._id]">
                 <span x-text="commentVisibility[link._id] ? 'Ocultar comentarios' : 'Ver comentarios'"></span>
-              </label>
+              </button>
             </div>
             
             <!-- Lista de comentarios -->
