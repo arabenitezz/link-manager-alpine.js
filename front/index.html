@@ -201,11 +201,23 @@
             
             if (!response.ok) throw new Error('Error al agregar el comentario');
             
+            // Obtener el comentario creado
+            const newComment = await response.json();
+            
+            // Encontrar el link correspondiente y agregar el comentario a su array
+            const link = this.links.find(l => l._id === linkId);
+            if (link) {
+              if (!link.comments) {
+                link.comments = [];
+              }
+              link.comments.push(newComment);
+            }
+            
             // Limpiar el campo de comentario
             this.newComments[linkId] = '';
             
-            // Recargar los enlaces para mostrar el nuevo comentario
-            await this.fetchLinks(this.searchTags);
+            // Forzar una actualización de la vista
+            this.links = [...this.links];
           } catch (error) {
             console.error('Error al crear el comentario:', error);
           }
