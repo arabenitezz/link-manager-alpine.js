@@ -32,6 +32,31 @@
           <p>Votos: <span x-text="link.votes"></span></p>
           <button @click="voteLink(link._id, 'up')">👍</button>
           <button @click="voteLink(link._id, 'down')">👎</button>
+
+          <!-- Sección de comentarios -->
+          <div class="comments-section">
+            <h4>Comentarios</h4>
+            <template x-if="link.comments">
+              <div class="comments-list">
+                <template x-for="comment in link.comments" :key="comment._id">
+                  <div class="comment">
+                    <p x-text="comment.text"></p>
+                  </div>
+                </template>
+              </div>
+            </template>
+            
+            <!-- Formulario para agregar comentario -->
+            <form @submit.prevent="createComment(link._id)">
+              <input 
+                type="text" 
+                :placeholder="'Añadir un comentario...'"
+                x-model="newComments[link._id]"
+                required
+              >
+              <button type="submit">Comentar</button>
+            </form>
+          </div>
         </div>
       </template>
     </div>
@@ -42,49 +67,84 @@
       return {
         links: [],
         newLink: { title: '', url: '', tags: '' },
+        newComments: {},
 
-        // Obtener todos los enlaces
-async fetchLinks() {
-  try {
-    const response = await fetch('http://localhost:5000/api/links');
-    if (!response.ok) throw new Error('Error al obtener los enlaces');
-    this.links = await response.json();
-  } catch (error) {
-    console.error('Error al cargar los enlaces:', error);
-  }
-},
+        // Obtener todos los enlaces con sus comentarios
+        async fetchLinks() {
+          try {
+            const response = await fetch('http://localhost:5000/api/links');
+            if (!response.ok) throw new Error('Error al obtener los enlaces');
+            const links = await response.json();
+            
+            // Obtener comentarios para cada enlace
+            for (let link of links) {
+              const commentsResponse = await fetch(`http://localhost:5000/api/links/${link._id}`);
+              if (commentsResponse.ok) {
+                const linkWithComments = await commentsResponse.json();
+                link.comments = linkWithComments.comments;
+              }
+            }
+            
+            this.links = links;
+          } catch (error) {
+            console.error('Error al cargar los enlaces:', error);
+          }
+        },
 
-// Crear un nuevo enlace
-async createLink() {
-  try {
-    const response = await fetch('http://localhost:5000/api/links', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(this.newLink),
-    });
-    if (!response.ok) throw new Error('Error al agregar el enlace');
-    this.newLink = { title: '', url: '', tags: '' }; // Resetear formulario
-    this.fetchLinks(); // Recargar enlaces
-  } catch (error) {
-    console.error('Error al crear un enlace:', error);
-  }
-},
+        // Crear un nuevo enlace
+        async createLink() {
+          try {
+            const response = await fetch('http://localhost:5000/api/links', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(this.newLink),
+            });
+            if (!response.ok) throw new Error('Error al agregar el enlace');
+            this.newLink = { title: '', url: '', tags: '' }; // Resetear formulario
+            this.fetchLinks(); // Recargar enlaces
+          } catch (error) {
+            console.error('Error al crear un enlace:', error);
+          }
+        },
 
-// Votar un enlace
-async voteLink(id, voteType) {
-  try {
-    const response = await fetch(`http://localhost:5000/api/links/${id}/vote`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ voteType }),
-    });
-    if (!response.ok) throw new Error('Error al votar el enlace');
-    this.fetchLinks(); // Recargar enlaces
-  } catch (error) {
-    console.error('Error al votar el enlace:', error);
-  }
-},
+        // Crear un nuevo comentario
+        async createComment(linkId) {
+          try {
+            const response = await fetch('http://localhost:5000/api/comments', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                text: this.newComments[linkId],
+                linkId: linkId
+              }),
+            });
+            
+            if (!response.ok) throw new Error('Error al agregar el comentario');
+            
+            // Limpiar el campo de comentario
+            this.newComments[linkId] = '';
+            
+            // Recargar los enlaces para mostrar el nuevo comentario
+            this.fetchLinks();
+          } catch (error) {
+            console.error('Error al crear el comentario:', error);
+          }
+        },
 
+        // Votar un enlace
+        async voteLink(id, voteType) {
+          try {
+            const response = await fetch(`http://localhost:5000/api/links/${id}/vote`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ voteType }),
+            });
+            if (!response.ok) throw new Error('Error al votar el enlace');
+            this.fetchLinks(); // Recargar enlaces
+          } catch (error) {
+            console.error('Error al votar el enlace:', error);
+          }
+        },
 
         // Inicialización
         init() {
