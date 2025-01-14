@@ -13,7 +13,7 @@
   </header>
   <div class="container" x-data="linksApp()" x-init="init()">
     <!-- Formulario para agregar un nuevo link -->
-    <div>
+    <div class="container2">
       <h2>Agregar nuevo enlace</h2>
       <form @submit.prevent="createLink">
         <input type="text" placeholder="Título" x-model="newLink.title" required>
@@ -38,8 +38,8 @@
     </div>
 
     <!-- Lista de enlaces -->
-    <div>
-      <h2>Enlaces</h2>
+    <h2>Enlaces</h2>
+    <div class="links-container">
       <template x-for="link in links" :key="link._id">
         <div class="link">
           <h3 x-text="link.title"></h3>
@@ -57,31 +57,11 @@
               ></span>
             </template>
           </p>
-          <button @click="voteLink(link._id, 'up')">👍</button>
-          <button @click="voteLink(link._id, 'down')">👎</button>
-
+          <button class="no-background" @click="voteLink(link._id, 'up')">👍</button>
+          <button class="no-background" @click="voteLink(link._id, 'down')">👎</button>
+          
           <!-- Sección de comentarios -->
           <div class="comments-section">
-            <h4>Comentarios</h4>
-            
-            <!-- Toggle de comentarios -->
-            <div class="comments-toggle">
-              <button @click="commentVisibility[link._id] = !commentVisibility[link._id]">
-                <span x-text="commentVisibility[link._id] ? 'Ocultar comentarios' : 'Ver comentarios'"></span>
-              </button>
-            </div>
-            
-            <!-- Lista de comentarios -->
-            <div class="comments-list" x-show="commentVisibility[link._id]">
-              <template x-for="comment in link.comments" :key="comment._id">
-                <div class="comment">
-                  <p x-text="comment.text"></p>
-                  <small x-text="new Date(comment.createdAt).toLocaleString()"></small>
-                </div>
-              </template>
-              <p x-show="!link.comments || link.comments.length === 0">No hay comentarios aún</p>
-            </div>
-            
             <!-- Formulario para agregar comentario -->
             <form @submit.prevent="createComment(link._id)" class="comment-form">
               <input 
@@ -92,11 +72,31 @@
               >
               <button type="submit">Comentar</button>
             </form>
+
+            <!-- Lista de comentarios -->
+            <div class="comments-list" x-show="commentVisibility[link._id]">
+              <template x-for="comment in link.comments" :key="comment._id">
+                <div class="comment">
+                  <p x-text="comment.text"></p>
+                  <small x-text="new Date(comment.createdAt).toLocaleString()"></small>
+                </div>
+              </template>
+              <p x-show="!link.comments || link.comments.length === 0">No hay comentarios aún</p>
+            </div>
+                <!-- Toggle de comentarios -->
+                <div class="comments-toggle">
+                  <button @click="commentVisibility[link._id] = !commentVisibility[link._id]">
+                    <span x-text="commentVisibility[link._id] ? 'Ocultar comentarios' : 'Ver comentarios'"></span>
+                  </button>
+                </div>
           </div>
         </div>
       </template>
     </div>
   </div>
+</body>
+</html>
+
 
   <script>
     function linksApp() {
