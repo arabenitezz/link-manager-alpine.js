@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Links & Comments</title>
+  <title>Sol</title>
+  <link rel="stylesheet" href="styless.css">
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 <body>
@@ -22,6 +23,20 @@
       </form>
     </div>
 
+    <!-- Buscador por etiquetas -->
+    <div class="search-section">
+      <h2>Buscar por etiquetas</h2>
+      <form @submit.prevent="searchByTags">
+        <input 
+          type="text" 
+          placeholder="Buscar por etiquetas (separadas por coma)" 
+          x-model="searchTags"
+        >
+        <button type="submit">Buscar</button>
+        <button type="button" @click="clearSearch">Limpiar búsqueda</button>
+      </form>
+    </div>
+
     <!-- Lista de enlaces -->
     <div>
       <h2>Enlaces</h2>
@@ -30,24 +45,51 @@
           <h3 x-text="link.title"></h3>
           <p><a :href="link.url" target="_blank" x-text="link.url"></a></p>
           <p>Votos: <span x-text="link.votes"></span></p>
+          <!-- Mostrar etiquetas -->
+          <p class="tags">
+            Etiquetas: 
+            <template x-for="tag in link.tags" :key="tag">
+              <span 
+                class="tag" 
+                x-text="tag"
+                @click="searchSingleTag(tag)"
+                style="cursor: pointer; margin-right: 5px; color: blue;"
+              ></span>
+            </template>
+          </p>
           <button @click="voteLink(link._id, 'up')">👍</button>
           <button @click="voteLink(link._id, 'down')">👎</button>
 
           <!-- Sección de comentarios -->
           <div class="comments-section">
             <h4>Comentarios</h4>
-            <template x-if="link.comments">
-              <div class="comments-list">
-                <template x-for="comment in link.comments" :key="comment._id">
-                  <div class="comment">
-                    <p x-text="comment.text"></p>
-                  </div>
-                </template>
-              </div>
-            </template>
+            
+            <!-- Toggle de comentarios -->
+            <div class="comments-toggle">
+              <input 
+                type="checkbox" 
+                :id="'toggle-comments-' + link._id" 
+                class="comments-toggle-checkbox"
+                x-model="commentVisibility[link._id]"
+              >
+              <label :for="'toggle-comments-' + link._id">
+                <span x-text="commentVisibility[link._id] ? 'Ocultar comentarios' : 'Ver comentarios'"></span>
+              </label>
+            </div>
+            
+            <!-- Lista de comentarios -->
+            <div class="comments-list" x-show="commentVisibility[link._id]">
+              <template x-for="comment in link.comments" :key="comment._id">
+                <div class="comment">
+                  <p x-text="comment.text"></p>
+                  <small x-text="new Date(comment.createdAt).toLocaleString()"></small>
+                </div>
+              </template>
+              <p x-show="!link.comments || link.comments.length === 0">No hay comentarios aún</p>
+            </div>
             
             <!-- Formulario para agregar comentario -->
-            <form @submit.prevent="createComment(link._id)">
+            <form @submit.prevent="createComment(link._id)" class="comment-form">
               <input 
                 type="text" 
                 :placeholder="'Añadir un comentario...'"
@@ -68,11 +110,18 @@
         links: [],
         newLink: { title: '', url: '', tags: '' },
         newComments: {},
+        searchTags: '',
+        commentVisibility: {},
 
         // Obtener todos los enlaces con sus comentarios
-        async fetchLinks() {
+        async fetchLinks(tags = '') {
           try {
-            const response = await fetch('http://localhost:5000/api/links');
+            let url = 'http://localhost:5000/api/links';
+            if (tags) {
+              url += `?tags=${encodeURIComponent(tags)}`;
+            }
+            
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Error al obtener los enlaces');
             const links = await response.json();
             
@@ -81,7 +130,12 @@
               const commentsResponse = await fetch(`http://localhost:5000/api/links/${link._id}`);
               if (commentsResponse.ok) {
                 const linkWithComments = await commentsResponse.json();
-                link.comments = linkWithComments.comments;
+                link.comments = linkWithComments.comments || [];
+                
+                // Inicializar la visibilidad de comentarios si no existe
+                if (this.commentVisibility[link._id] === undefined) {
+                  this.commentVisibility[link._id] = false;
+                }
               }
             }
             
@@ -91,17 +145,44 @@
           }
         },
 
+        // Buscar por etiquetas
+        async searchByTags() {
+          await this.fetchLinks(this.searchTags);
+        },
+
+        // Buscar por una sola etiqueta
+        async searchSingleTag(tag) {
+          this.searchTags = tag;
+          await this.fetchLinks(tag);
+        },
+
+        // Limpiar búsqueda
+        async clearSearch() {
+          this.searchTags = '';
+          await this.fetchLinks();
+        },
+
         // Crear un nuevo enlace
         async createLink() {
           try {
+            const tags = this.newLink.tags
+              .split(',')
+              .map(tag => tag.trim().toLowerCase())
+              .filter(tag => tag.length > 0);
+
+            const linkData = {
+              ...this.newLink,
+              tags
+            };
+
             const response = await fetch('http://localhost:5000/api/links', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(this.newLink),
+              body: JSON.stringify(linkData),
             });
             if (!response.ok) throw new Error('Error al agregar el enlace');
-            this.newLink = { title: '', url: '', tags: '' }; // Resetear formulario
-            this.fetchLinks(); // Recargar enlaces
+            this.newLink = { title: '', url: '', tags: '' };
+            this.fetchLinks();
           } catch (error) {
             console.error('Error al crear un enlace:', error);
           }
@@ -120,12 +201,8 @@
             });
             
             if (!response.ok) throw new Error('Error al agregar el comentario');
-            
-            // Limpiar el campo de comentario
             this.newComments[linkId] = '';
-            
-            // Recargar los enlaces para mostrar el nuevo comentario
-            this.fetchLinks();
+            this.fetchLinks(this.searchTags);
           } catch (error) {
             console.error('Error al crear el comentario:', error);
           }
@@ -140,7 +217,7 @@
               body: JSON.stringify({ voteType }),
             });
             if (!response.ok) throw new Error('Error al votar el enlace');
-            this.fetchLinks(); // Recargar enlaces
+            this.fetchLinks(this.searchTags);
           } catch (error) {
             console.error('Error al votar el enlace:', error);
           }
