@@ -184,10 +184,28 @@ button:hover {
 .comments-section {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--light);
+    border-top: 1px solid #eee;
 }
 
-/* El contenedor del toggle para mostrar/ocultar comentarios */
+.comments-list {
+    margin-top: 1rem;
+}
+
+.comment {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.comment small {
+    color: #666;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* Estilo para el toggle de los comentarios */
 .comments-toggle {
     background-color: var(--accent);
     color: #fff;
@@ -201,30 +219,6 @@ button:hover {
 
 .comments-toggle:hover {
     background-color: var(--accent-dark);
-}
-
-/* Se ocultan los comentarios por defecto */
-.comments-list {
-    display: none;
-    margin-top: 1rem;
-}
-
-/* Se muestra el contenedor de comentarios solo cuando el checkbox está marcado */
-.comments-toggle input:checked + .comments-list {
-    display: block;
-}
-
-.comment {
-    background-color: var(--light);
-    padding: 1rem;
-    border-radius: 4px;
-    border: 1px solid var(--primary);
-    margin-bottom: 0.5rem;
-}
-
-/* Utilizamos un checkbox oculto para controlar la visibilidad de los comentarios */
-.comments-toggle input {
-    display: none;
 }
 
 .comments-toggle label {

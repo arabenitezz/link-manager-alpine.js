@@ -125,11 +125,16 @@
               if (commentsResponse.ok) {
                 const linkWithComments = await commentsResponse.json();
                 link.comments = linkWithComments.comments || [];
-                
-                // Inicializar la visibilidad de comentarios si no existe
-                if (this.commentVisibility[link._id] === undefined) {
-                  this.commentVisibility[link._id] = false;
-                }
+              } else {
+                link.comments = [];
+              }
+              
+              // Inicializar la visibilidad de comentarios y el campo de nuevo comentario
+              if (this.commentVisibility[link._id] === undefined) {
+                this.commentVisibility[link._id] = false;
+              }
+              if (this.newComments[link._id] === undefined) {
+                this.newComments[link._id] = '';
               }
             }
             
@@ -190,13 +195,17 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 text: this.newComments[linkId],
-                linkId: linkId
+                link: linkId
               }),
             });
             
             if (!response.ok) throw new Error('Error al agregar el comentario');
+            
+            // Limpiar el campo de comentario
             this.newComments[linkId] = '';
-            this.fetchLinks(this.searchTags);
+            
+            // Recargar los enlaces para mostrar el nuevo comentario
+            await this.fetchLinks(this.searchTags);
           } catch (error) {
             console.error('Error al crear el comentario:', error);
           }
