@@ -40,24 +40,24 @@
       <template x-for="link in links" :key="link._id">
         <div class="link">
           <h3 x-text="link.title"></h3>
-          <p><a :href="link.url" target="_blank" x-text="link.url"></a></p>
-          <p>Votos: <span x-text="link.votes"></span></p>
-          <!-- Mostrar etiquetas -->
-          <p class="tags">
-            Etiquetas: 
-            <template x-for="tag in link.tags" :key="tag">
-              <span 
-                class="tag" 
-                x-text="tag"
-                @click="searchSingleTag(tag)"
-                style="cursor: pointer; margin-right: 5px; color: blue;"
-              ></span>
-            </template>
-          </p>
-          <h3>Deja tu apreciacion:</h3>
-          <button class="no-background" @click="voteLink(link._id, 'up')">Me gusta 👍</button>
-          <button class="no-background" @click="voteLink(link._id, 'down')">No me gusta👎</button>
           
+          <div class="link-main-content">
+            <p><a :href="link.url" target="_blank" x-text="link.url"></a></p>
+            <p class="tags">
+              <template x-for="tag in link.tags" :key="tag">
+                <span class="tag" x-text="tag" @click="searchSingleTag(tag)"></span>
+              </template>
+            </p>
+          </div>
+
+          <div class="link-actions">
+            <p>Votos: <span x-text="link.votes"></span></p>
+            <div>
+              <button class="no-background" @click="voteLink(link._id, 'up')">👍</button>
+              <button class="no-background" @click="voteLink(link._id, 'down')">👎</button>
+            </div>
+          </div>
+
           <!-- Sección de comentarios -->
           <div class="comments-section">
             <div class="comments-header">
