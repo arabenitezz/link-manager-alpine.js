@@ -146,7 +146,22 @@ button:hover {
   gap: 0.5rem;
 }
 
-.link button.no-background {
+.no-background,
+.toggle-comments {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  font-size: 1rem;
+  margin: 0;
+  cursor: pointer;
+}
+
+.no-background:hover,
+.toggle-comments:hover {
+  background: none;
+}
+
+.no-background {
   padding: 0.25rem;
   font-size: 1rem;
   margin: 0;
@@ -187,10 +202,7 @@ button:hover {
 }
 
 .toggle-comments {
-  background: none;
-  border: none;
   color: #454140;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
