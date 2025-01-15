@@ -1,166 +1,189 @@
 /* Estilos básicos */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  header {
-    background-color: #007BFF;
-    color: white;
-    padding: 1em;
-    text-align: center;
-  }
-  
-  h2 {
-    color: #2d3748;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-  }
-  .container {
-    padding: 2em;
-  }
-  
-  .container2 h2 {
-    color: #2d3748;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-  }
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  .search-section h2{
-    color: #2d3748;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-  }
-  .links-container h2 {
-    margin-bottom: 1rem;
-    color: #2d3748;
-  }
-  
-  form {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 0.375rem; /* 6px */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 28rem; /* 448px */
-    margin: 0 auto 1.5rem auto;
-  }
-  
-  form input {
-    width: 100%;
-    margin-top: 0.5rem;
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 0.375rem;
-    margin-bottom: 1rem;
-  }
-  
-  form button[type="submit"],
-  form button[type="button"] {
-    width: 100%;
-    background-color: #4299e1;
-    color: white;
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    border: none;
-    transition: background-color 0.2s ease;
-    cursor: pointer;
-  }
-  
-  form button[type="submit"]:hover,
-  form button[type="button"]:hover {
-    background-color: #3182ce;
-  }
-  
-  .links-container {
-    margin-top: 2rem;
-  }
-  
-  .link {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 0.375rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1.5rem;
-    transition: box-shadow 0.2s ease;
-  }
-  
-  .link:hover {
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-  }
-  
-  .link h3 {
-    font-size: 1.25rem; /* 20px */
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #2d3748;
-  }
-  
-  .link p {
-    color: #718096;
-    margin-bottom: 1rem;
-  }
-  
-  .link button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    margin-right: 0.5rem;
-  }
-  
-  .comments-section {
-    margin-top: 1.5rem;
-  }
-  
-  .comments-section form {
-    margin-bottom: 1rem;
-  }
-  
-  .comments-section input {
-    width: calc(100% - 2rem);
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.375rem;
-    margin-right: 0.5rem;
-  }
-  
-  .comments-section button {
-    background-color: #4299e1;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  .comments-section button:hover {
-    background-color: #3182ce;
-  }
-  
-  .comments-toggle button {
-    background: none;
-    border: none;
-    color: #4299e1;
-    cursor: pointer;
-    font-size: 0.875rem;
-  }
-  
-  .comment {
-    margin-bottom: 1rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .comment small {
-    color: #718096;
-    font-size: 0.875rem;
-  }
+header {
+  background-color: #007BFF;
+  color: white;
+  padding: 1em;
+  text-align: center;
+}
+
+h2 {
+  color: #2d3748;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.container {
+  padding: 2em;
+}
+
+/* Estilos para el formulario de nuevo enlace */
+form {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 40rem;
+  margin: 0 auto 1.5rem auto;
+}
+
+form input {
+  width: calc(100% - 2rem); /* Ajusta el ancho considerando los márgenes */
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+
+button {
+  background-color: #4299e1;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  margin: 0 0.5rem;
+  display: inline-block;
+}
+
+button:hover {
+  background-color: #3182ce;
+}
+
+/* Estilos para los enlaces */
+.link {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.link:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.link h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+}
+
+.link p {
+  color: #718096;
+  margin-bottom: 1rem;
+}
+
+.link button.no-background {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  color: #2d3748;
+}
+
+/* Estilos mejorados para la sección de comentarios */
+.comments-section {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.comments-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2d3748;
+}
+
+.toggle-comments {
+  background: none;
+  border: none;
+  color: #4a5568;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.comment-count {
+  color: #718096;
+}
+
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.comment-form input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  font-size: 0.9rem;
+}
+
+.comment-form button {
+  padding: 0.75rem 1.5rem;
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.comment-form button:hover {
+  background-color: #3182ce;
+}
+
+.comments-list {
+  margin-top: 1rem;
+}
+
+.comment {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #f7fafc;
+  margin-bottom: 0.75rem;
+}
+
+.comment-text {
+  margin: 0 0 0.5rem 0;
+  color: #2d3748;
+}
+
+.comment-date {
+  color: #718096;
+  font-size: 0.8rem;
+}
+
+.no-comments {
+  text-align: center;
+  color: #718096;
+  font-style: italic;
+  padding: 1rem;
+}
   
   
   
