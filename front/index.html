@@ -99,13 +99,11 @@
         </div>
       </template>
   </div>
-</body>
-</html>
-
 
   <script>
     function linksApp() {
       return {
+        baseUrl: 'https://link-manager-backend-production.up.railway.app/api',
         links: [],
         newLink: { title: '', url: '', tags: '' },
         newComments: {},
@@ -115,7 +113,7 @@
         // Obtener todos los enlaces con sus comentarios
         async fetchLinks(tags = '') {
           try {
-            let url = 'https://link-manager-backend-production.up.railway.app/api';
+            let url = this.baseUrl;
             if (tags) {
               url += `?tags=${encodeURIComponent(tags)}`;
             }
@@ -126,7 +124,7 @@
             
             // Obtener comentarios para cada enlace
             for (let link of links) {
-              const commentsResponse = await fetch(`https://link-manager-backend-production.up.railway.app/api/links/${link._id}`);
+              const commentsResponse = await fetch(`${this.baseUrl}/links/${link._id}`);
               if (commentsResponse.ok) {
                 const linkWithComments = await commentsResponse.json();
                 link.comments = linkWithComments.comments || [];
@@ -179,7 +177,7 @@
               tags
             };
 
-            const response = await fetch('https://link-manager-backend-production.up.railway.app/api/links', {
+            const response = await fetch(`${this.baseUrl}/links`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(linkData),
@@ -195,7 +193,7 @@
         // Crear un nuevo comentario
         async createComment(linkId) {
           try {
-            const response = await fetch('https://link-manager-backend-production.up.railway.app/api/comments', {
+            const response = await fetch(`${this.baseUrl}/comments`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -231,7 +229,7 @@
         // Votar un enlace
         async voteLink(id, voteType) {
           try {
-            const response = await fetch(`https://link-manager-backend-production.up.railway.app/api/links/${id}/vote`, {
+            const response = await fetch(`${this.baseUrl}/links/${id}/vote`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ voteType }),
