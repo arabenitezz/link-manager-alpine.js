@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
       {
-        "src": "front/styless.css",
+        "src": "front/index.html",
         "use": "@vercel/static"
       }
     ],
