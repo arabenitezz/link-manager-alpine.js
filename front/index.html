@@ -115,7 +115,7 @@
         // Obtener todos los enlaces con sus comentarios
         async fetchLinks(tags = '') {
           try {
-            let url = 'http://localhost:5000/api/links';
+            let url = 'https://link-manager-backend-production.up.railway.app/api';
             if (tags) {
               url += `?tags=${encodeURIComponent(tags)}`;
             }
