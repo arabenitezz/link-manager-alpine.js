@@ -110,42 +110,47 @@
         searchTags: '',
         commentVisibility: {},
 
-        // Obtener todos los enlaces con sus comentarios
-        async fetchLinks(tags = '') {
-          try {
-            let url = this.baseUrl;
-            if (tags) {
-              url += `?tags=${encodeURIComponent(tags)}`;
-            }
-            
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Error al obtener los enlaces');
-            const links = await response.json();
-            
-            // Obtener comentarios para cada enlace
-            for (let link of links) {
-              const commentsResponse = await fetch(`${this.baseUrl}/links/${link._id}`);
-              if (commentsResponse.ok) {
-                const linkWithComments = await commentsResponse.json();
-                link.comments = linkWithComments.comments || [];
-              } else {
-                link.comments = [];
-              }
-              
-              // Inicializar la visibilidad de comentarios y el campo de nuevo comentario
-              if (this.commentVisibility[link._id] === undefined) {
-                this.commentVisibility[link._id] = false;
-              }
-              if (this.newComments[link._id] === undefined) {
-                this.newComments[link._id] = '';
-              }
-            }
-            
-            this.links = links;
-          } catch (error) {
-            console.error('Error al cargar los enlaces:', error);
-          }
-        },
+// Obtener todos los enlaces con sus comentarios
+async fetchLinks(tags = '') {
+  try {
+    // Construir la URL base para obtener los enlaces
+    let url = `${this.baseUrl}/links`;
+    if (tags) {
+      url += `?tags=${encodeURIComponent(tags)}`;
+    }
+
+    // Fetch para obtener los enlaces
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Error al obtener los enlaces');
+    const links = await response.json();
+
+    // Iterar sobre los enlaces para obtener sus comentarios
+    for (let link of links) {
+      // Fetch para obtener los comentarios de un enlace específico
+      const commentsResponse = await fetch(`${this.baseUrl}/comments/${link._id}`);
+      if (commentsResponse.ok) {
+        const linkWithComments = await commentsResponse.json();
+        link.comments = linkWithComments.comments || [];
+      } else {
+        link.comments = [];
+      }
+
+      // Inicializar la visibilidad de comentarios y el campo de nuevo comentario
+      if (this.commentVisibility[link._id] === undefined) {
+        this.commentVisibility[link._id] = false;
+      }
+      if (this.newComments[link._id] === undefined) {
+        this.newComments[link._id] = '';
+      }
+    }
+
+    // Asignar los enlaces con sus comentarios a la variable `links`
+    this.links = links;
+  } catch (error) {
+    console.error('Error al cargar los enlaces:', error);
+  }
+},
+
 
         // Buscar por etiquetas
         async searchByTags() {
