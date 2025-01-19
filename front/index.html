@@ -99,7 +99,6 @@
         </div>
       </template>
   </div>
-
   <script>
     function linksApp() {
       return {
@@ -109,82 +108,54 @@
         newComments: {},
         searchTags: '',
         commentVisibility: {},
-
-// Obtener todos los enlaces con sus comentarios
-async fetchLinks(tags = '') {
-  try {
-    // Construir la URL base para obtener los enlaces
-    let url = `${this.baseUrl}/links`;
-    if (tags) {
-      url += `?tags=${encodeURIComponent(tags)}`;
-    }
-
-      // Fetch para obtener los enlaces con sus comentarios
-      const response = await fetch(url);
-    if (!response.ok) throw new Error('Error al obtener los enlaces');
-    const links = await response.json();
-
-    // Inicializar la visibilidad de comentarios y el campo de nuevo comentario
-    links.forEach(link => {
-      if (this.commentVisibility[link._id] === undefined) {
-        this.commentVisibility[link._id] = false;
-      }
-      if (this.newComments[link._id] === undefined) {
-        this.newComments[link._id] = '';
-      }
-    });
-
-    // Asignar los enlaces con sus comentarios a la variable `links`
-    this.links = links;
-  } catch (error) {
-    console.error('Error al cargar los enlaces:', error);
-  }
-},
-
-
-        // Buscar por etiquetas
-        async searchByTags() {
-          await this.fetchLinks(this.searchTags);
-        },
-
-        // Buscar por una sola etiqueta
-        async searchSingleTag(tag) {
-          this.searchTags = tag;
-          await this.fetchLinks(tag);
-        },
-
-        // Limpiar búsqueda
-        async clearSearch() {
-          this.searchTags = '';
-          await this.fetchLinks();
-        },
-
-        // Crear un nuevo enlace
-        async createLink() {
+  
+        // Fetch para obtener los enlaces
+        async fetchLinks(tags = '') {
           try {
-            const tags = this.newLink.tags
-              .split(',')
-              .map(tag => tag.trim().toLowerCase())
-              .filter(tag => tag.length > 0);
-
-            const linkData = {
-              ...this.newLink,
-              tags
-            };
-
-            const response = await fetch(`${this.baseUrl}/links`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(linkData),
+            const url = tags
+              ? `${this.baseUrl}/links?tags=${encodeURIComponent(tags)}`
+              : `${this.baseUrl}/links`;
+  
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Error al obtener los enlaces');
+            const links = await response.json();
+  
+            // Obtener comentarios para cada enlace de forma paralela
+            const linksWithComments = await Promise.all(
+              links.map(async (link) => {
+                try {
+                  const commentsResponse = await fetch(`${this.baseUrl}/comments/${link._id}`);
+                  if (commentsResponse.ok) {
+                    const commentData = await commentsResponse.json();
+                    return {
+                      ...link,
+                      comments: commentData.comments || [],
+                    };
+                  }
+                  return { ...link, comments: [] };
+                } catch (error) {
+                  console.error(`Error fetching comments for link ${link._id}:`, error);
+                  return { ...link, comments: [] };
+                }
+              })
+            );
+  
+            // Inicializar estados para cada enlace
+            linksWithComments.forEach((link) => {
+              if (this.commentVisibility[link._id] === undefined) {
+                this.commentVisibility[link._id] = false;
+              }
+              if (this.newComments[link._id] === undefined) {
+                this.newComments[link._id] = '';
+              }
             });
-            if (!response.ok) throw new Error('Error al agregar el enlace');
-            this.newLink = { title: '', url: '', tags: '' };
-            this.fetchLinks();
+  
+            this.links = linksWithComments;
           } catch (error) {
-            console.error('Error al crear un enlace:', error);
+            console.error('Error al cargar los enlaces:', error);
           }
         },
-
+  
         // Crear un nuevo comentario
         async createComment(linkId) {
           try {
@@ -193,34 +164,81 @@ async fetchLinks(tags = '') {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 text: this.newComments[linkId],
-                link: linkId
+                link: linkId,
               }),
             });
-            
+  
             if (!response.ok) throw new Error('Error al agregar el comentario');
-            
+  
             // Obtener el comentario creado
             const newComment = await response.json();
-            
-            // Encontrar el link correspondiente y agregar el comentario a su array
-            const link = this.links.find(l => l._id === linkId);
-            if (link) {
-              if (!link.comments) {
-                link.comments = [];
+  
+            // Actualizar el comentario en el estado local
+            const linkIndex = this.links.findIndex((l) => l._id === linkId);
+            if (linkIndex !== -1) {
+              if (!this.links[linkIndex].comments) {
+                this.links[linkIndex].comments = [];
               }
-              link.comments.push(newComment);
+  
+              // Agregar el nuevo comentario al array
+              this.links[linkIndex].comments.push({
+                ...newComment,
+                createdAt: new Date().toISOString(),
+              });
+  
+              // Limpiar el campo de comentario
+              this.newComments[linkId] = '';
+  
+              // Forzar una actualización de la vista
+              this.links = [...this.links];
             }
-            
-            // Limpiar el campo de comentario
-            this.newComments[linkId] = '';
-            
-            // Forzar una actualización de la vista
-            this.links = [...this.links];
           } catch (error) {
             console.error('Error al crear el comentario:', error);
           }
         },
-
+  
+        // Buscar por etiquetas
+        async searchByTags() {
+          await this.fetchLinks(this.searchTags);
+        },
+  
+        // Buscar por una sola etiqueta
+        async searchSingleTag(tag) {
+          this.searchTags = tag;
+          await this.fetchLinks(tag);
+        },
+  
+        // Limpiar búsqueda
+        async clearSearch() {
+          this.searchTags = '';
+          await this.fetchLinks();
+        },
+  
+        // Crear un nuevo enlace
+        async createLink() {
+          try {
+            const tags = this.newLink.tags
+              .split(',')
+              .map((tag) => tag.trim().toLowerCase())
+              .filter((tag) => tag.length > 0);
+  
+            const linkData = { ...this.newLink, tags };
+  
+            const response = await fetch(`${this.baseUrl}/links`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(linkData),
+            });
+  
+            if (!response.ok) throw new Error('Error al agregar el enlace');
+  
+            this.newLink = { title: '', url: '', tags: '' };
+            this.fetchLinks();
+          } catch (error) {
+            console.error('Error al crear un enlace:', error);
+          }
+        },
+  
         // Votar un enlace
         async voteLink(id, voteType) {
           try {
@@ -229,20 +247,22 @@ async fetchLinks(tags = '') {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ voteType }),
             });
+  
             if (!response.ok) throw new Error('Error al votar el enlace');
             this.fetchLinks(this.searchTags);
           } catch (error) {
             console.error('Error al votar el enlace:', error);
           }
         },
-
+  
         // Inicialización
         init() {
           this.fetchLinks();
-        }
+        },
       };
     }
   </script>
+  
 </body>
 </html>
 
