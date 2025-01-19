@@ -119,30 +119,20 @@ async fetchLinks(tags = '') {
       url += `?tags=${encodeURIComponent(tags)}`;
     }
 
-    // Fetch para obtener los enlaces
-    const response = await fetch(url);
+      // Fetch para obtener los enlaces con sus comentarios
+      const response = await fetch(url);
     if (!response.ok) throw new Error('Error al obtener los enlaces');
     const links = await response.json();
 
-    // Iterar sobre los enlaces para obtener sus comentarios
-    for (let link of links) {
-      // Fetch para obtener los comentarios de un enlace específico
-      const commentsResponse = await fetch(`${this.baseUrl}/comments/${link._id}`);
-      if (commentsResponse.ok) {
-        const linkWithComments = await commentsResponse.json();
-        link.comments = linkWithComments.comments || [];
-      } else {
-        link.comments = [];
-      }
-
-      // Inicializar la visibilidad de comentarios y el campo de nuevo comentario
+    // Inicializar la visibilidad de comentarios y el campo de nuevo comentario
+    links.forEach(link => {
       if (this.commentVisibility[link._id] === undefined) {
         this.commentVisibility[link._id] = false;
       }
       if (this.newComments[link._id] === undefined) {
         this.newComments[link._id] = '';
       }
-    }
+    });
 
     // Asignar los enlaces con sus comentarios a la variable `links`
     this.links = links;
