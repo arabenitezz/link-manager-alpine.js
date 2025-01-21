@@ -1,6 +1,7 @@
 # Darth Vader UI with Alpine.js 🛸⚡
 
 A sleek and dynamic frontend inspired by **Darth Vader**, built using **Alpine.js**. This project combines lightweight interactivity with a bold dark-side design.
+Here's the deploy: https://link-manager-alpine-js.vercel.app/
 
 ## Project Structure 🗂️
 
